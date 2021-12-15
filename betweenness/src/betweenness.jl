@@ -38,7 +38,6 @@ println("Output: " * output_dir * " " * output_file)
 doc = EzXML.readxml(open(joinpath(input_dir, input_file)))
 g = parse_graphtool_GraphML(doc)
 
-
 # Compute Betweenness
 _procs = addprocs();
 _g = g[:graph];
@@ -55,7 +54,7 @@ rmprocs(_procs)
 eb_coords = reduce(unique∘vcat, [findall(!iszero, eb) for eb in edge_betweenness])
 eb_data = reduce(hcat, [[edge_betweenness[i][c] for c in eb_coords] for i in 1:length(edge_betweenness)])
 
-df_e = DataFrame(eb_data)
+df_e = DataFrame(eb_data, :auto)
 rename!(df_e, map(Symbol∘string, limits))
 df_e.src_vid = [c[1]-1 for c in eb_coords]
 df_e.dst_vid = [c[2]-1 for c in eb_coords]
@@ -64,7 +63,7 @@ CSV.write(joinpath(output_dir, output_file_e), df_e)
 
 
 # Write Vertex Betweenness
-df_v = DataFrame(betweenness)
+df_v = DataFrame(betweenness, :auto)
 rename!(df_v, map(Symbol∘string, limits))
 df_v.vid = [i-1 for i in 1:size(df_v)[1]]
 output_file_v = output_file * "_vertex.csv"
